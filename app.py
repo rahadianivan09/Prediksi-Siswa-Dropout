@@ -32,24 +32,29 @@ numerical_inputs = {
 
 input_data = []
 
-# Mulai input user berdasarkan urutan asli dari pipeline['features']
 with st.form("student_input_form"):
     st.markdown("### 🔢 Input Data Siswa")
+
     for feat in features:
         if feat in numerical_inputs:
             min_val, max_val, default = numerical_inputs[feat]
             val = st.slider(f"{feat}", min_value=min_val, max_value=max_val, value=default)
             input_data.append(val)
         else:
-            val = st.checkbox(f"{feat.replace('_', ' ')}", value=False)
+            val = st.checkbox(f"{feat.replace('_', ' ').capitalize()}", value=False)
             input_data.append(1 if val else 0)
 
     submitted = st.form_submit_button("🔮 Prediksi Dropout")
 
-# Tombol prediksi ditekan
+# Prediksi setelah submit
 if submitted:
     try:
         input_array = np.array(input_data).reshape(1, -1)
+        
+        # Debug info (opsional)
+        st.caption(f"🔎 Jumlah fitur input: {len(input_data)} dari {len(features)}")
+        st.caption(f"Fitur input: {features}")
+
         input_scaled = scaler.transform(input_array)
         prediction = model.predict(input_scaled)
 
@@ -57,9 +62,6 @@ if submitted:
             st.error("❌ Prediksi: Siswa **berpotensi Dropout**.")
         else:
             st.success("✅ Prediksi: Siswa **kemungkinan LULUS**.")
-
-        # Debug info (opsional, bisa dihapus nanti)
-        st.caption(f"Jumlah fitur input: {len(input_data)} / yang diminta: {len(features)}")
-
+    
     except Exception as e:
-        st.error(f"Terjadi kesalahan saat prediksi: {e}")
+        st.error(f"🚨 Terjadi kesalahan saat prediksi:\n\n{e}")
