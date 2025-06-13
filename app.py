@@ -32,26 +32,34 @@ numerical_inputs = {
 
 input_data = []
 
-with st.expander("🔢 Fitur Numerik"):
-    for feat in numerical_inputs:
-        if feat in features:
-            min_val, max_val, default = numerical_inputs[feat]
-            val = st.slider(f"{feat}", min_val, max_val, default)
-            input_data.append(val)
-
-with st.expander("✅ Fitur Kategorikal"):
+# Mulai input user berdasarkan urutan asli dari pipeline['features']
+with st.form("student_input_form"):
+    st.markdown("### 🔢 Input Data Siswa")
     for feat in features:
-        if feat not in numerical_inputs:
+        if feat in numerical_inputs:
+            min_val, max_val, default = numerical_inputs[feat]
+            val = st.slider(f"{feat}", min_value=min_val, max_value=max_val, value=default)
+            input_data.append(val)
+        else:
             val = st.checkbox(f"{feat.replace('_', ' ')}", value=False)
             input_data.append(1 if val else 0)
 
-# Tombol prediksi
-if st.button("🔮 Prediksi Dropout"):
-    input_array = np.array(input_data).reshape(1, -1)
-    input_scaled = scaler.transform(input_array)
-    prediction = model.predict(input_scaled)
-    
-    if prediction[0] == 1:
-        st.error("❌ Prediksi: Siswa **berpotensi Dropout**.")
-    else:
-        st.success("✅ Prediksi: Siswa **kemungkinan LULUS**.")
+    submitted = st.form_submit_button("🔮 Prediksi Dropout")
+
+# Tombol prediksi ditekan
+if submitted:
+    try:
+        input_array = np.array(input_data).reshape(1, -1)
+        input_scaled = scaler.transform(input_array)
+        prediction = model.predict(input_scaled)
+
+        if prediction[0] == 1:
+            st.error("❌ Prediksi: Siswa **berpotensi Dropout**.")
+        else:
+            st.success("✅ Prediksi: Siswa **kemungkinan LULUS**.")
+
+        # Debug info (opsional, bisa dihapus nanti)
+        st.caption(f"Jumlah fitur input: {len(input_data)} / yang diminta: {len(features)}")
+
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat prediksi: {e}")
