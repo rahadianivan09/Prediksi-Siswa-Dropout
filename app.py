@@ -11,8 +11,8 @@ features = pipeline['features']
 st.title("📘 Prediksi Dropout Siswa")
 st.subheader("Masukkan Informasi Siswa")
 
-# Fitur numerik berdasarkan statistik deskriptif
-numerical_inputs = {
+# Mapping fitur numerik dan default nilai berdasarkan statistik deskriptif
+numerical_defaults = {
     "age": (15, 22, 17),
     "Medu": (0, 4, 2),
     "Fedu": (0, 4, 2),
@@ -27,41 +27,37 @@ numerical_inputs = {
     "health": (1, 5, 4),
     "absences": (0, 32, 3),
     "G1": (0, 19, 11),
-    "G2": (0, 19, 11)
+    "G2": (0, 19, 11),
+    "avg_grade": (0, 19, 11)
 }
 
 input_data = []
 
-with st.form("student_input_form"):
-    st.markdown("### 🔢 Input Data Siswa")
-
+# Input fitur numerik
+with st.expander("🔢 Fitur Numerik"):
     for feat in features:
-        if feat in numerical_inputs:
-            min_val, max_val, default = numerical_inputs[feat]
-            val = st.slider(f"{feat}", min_value=min_val, max_value=max_val, value=default)
+        if feat in numerical_defaults:
+            min_val, max_val, default = numerical_defaults[feat]
+            val = st.slider(f"{feat}", min_val, max_val, default)
             input_data.append(val)
-        else:
-            val = st.checkbox(f"{feat.replace('_', ' ').capitalize()}", value=False)
+
+# Input fitur kategorikal/dummy
+with st.expander("✅ Fitur Kategorikal"):
+    for feat in features:
+        if feat not in numerical_defaults:
+            val = st.checkbox(f"{feat.replace('_', ' ').title()}", value=False)
             input_data.append(1 if val else 0)
 
-    submitted = st.form_submit_button("🔮 Prediksi Dropout")
+# Tombol prediksi
+if st.button("🔮 Prediksi Dropout"):
+    input_array = np.array(input_data).reshape(1, -1)
+    input_scaled = scaler.transform(input_array)
+    prediction = model.predict(input_scaled)
 
-# Prediksi setelah submit
-if submitted:
-    try:
-        input_array = np.array(input_data).reshape(1, -1)
-        
-        # Debug info (opsional)
-        st.caption(f"🔎 Jumlah fitur input: {len(input_data)} dari {len(features)}")
-        st.caption(f"Fitur input: {features}")
+    if prediction[0] == 1:
+        st.error("❌ Prediksi: Siswa **berpotensi Dropout**.")
+    else:
+        st.success("✅ Prediksi: Siswa **kemungkinan LULUS**.")
 
-        input_scaled = scaler.transform(input_array)
-        prediction = model.predict(input_scaled)
-
-        if prediction[0] == 1:
-            st.error("❌ Prediksi: Siswa **berpotensi Dropout**.")
-        else:
-            st.success("✅ Prediksi: Siswa **kemungkinan LULUS**.")
-    
-    except Exception as e:
-        st.error(f"🚨 Terjadi kesalahan saat prediksi:\n\n{e}")
+# Validasi jumlah input
+st.caption(f"Jumlah fitur input: {len(input_data)} dari {len(features)}")
