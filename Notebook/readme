@@ -1,2 +1,33 @@
-halo...
-berisi notebook
+# 🎓 Prediksi Dropout Siswa
+
+Proyek ini bertujuan untuk memprediksi apakah seorang siswa akan dropout berdasarkan data akademik dan non-akademik.
+
+## 📂 Struktur Folder
+- `student_dropout.ipynb` : Notebook utama analisis dan modeling
+- `data/` : Folder berisi dataset mentah dan bersih
+- `models/` : Model yang sudah dilatih (jika ada)
+- `README.md` : Dokumentasi proyek
+
+## 📊 Dataset
+Dataset Student Performance dari UCI Machine Learning Repository. Berisi informasi nilai (G1, G2, G3) dan faktor non-akademik seperti absensi, pekerjaan orang tua, dsb.
+
+## 🛠️ Langkah Analisis
+1. Import & Persiapan Data
+2. EDA (Eksplorasi Data)
+3. Preprocessing (Encoding, Standarisasi)
+4. Pembuatan Label Dropout
+5. Modeling (Random Forest, Logistic Regression)
+6. Evaluasi Model
+
+## 🧠 Hasil Akhir
+- Akurasi: 94%
+- F1-Score: 79%
+- Recall : 85%
+- Presisi : 74%
+- Model terbaik: Logistic Regression
+
+## 🚀 Teknologi yang Digunakan
+- Python (pandas, scikit-learn, seaborn)
+- Jupyter Notebook / Google Colab
+- GitHub untuk version control
+
